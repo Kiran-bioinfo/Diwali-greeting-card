@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Diwali 🪔</title>
+
+    <meta property="og:title" content="🪔 Happy Diwali">
+    <meta property="og:description" content="A Diwali wish, made by hand for one person.">
+    <meta property="og:image" content="https://www.surajrana.dev/happydiwali/preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://www.surajrana.dev/happydiwali/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Happy Diwali">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🪔 Happy Diwali">
+    <meta name="twitter:description" content="A Diwali wish, made by hand for one person.">
+    <meta name="twitter:image" content="https://www.surajrana.dev/happydiwali/preview.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="fireworks" aria-hidden="true"></canvas>
+
+    <div class="stage" id="nameForm">
+        <div class="frame">
+            <div class="logo-bar">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="frame-corner tl"></div>
+            <div class="frame-corner tr"></div>
+            <div class="frame-corner bl"></div>
+            <div class="frame-corner br"></div>
+
+            <svg class="rangoli" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
+                <!-- outer dot ring -->
+                <g class="dotring"></g>
+                <!-- 8 big petals -->
+                <g class="petals-big"></g>
+                <!-- 8 small petals between -->
+                <g class="petals-small"></g>
+                <!-- inner dot ring -->
+                <g class="dotring-inner"></g>
+                <!-- center diya -->
+                <g class="diya">
+                    <circle cx="250" cy="250" r="46" />
+                    <path d="M250 205 Q238 185 250 170 Q262 185 250 205 Z" />
+                </g>
+            </svg>
+
+            <div class="content">
+                <span class="eyebrow">Shubh Deepavali</span>
+                <h1 class="title">Send a wish of light</h1>
+                <p class="lead">A small gift, made by hand, for one person.</p>
+
+                <div class="form">
+                    <label class="sr-only" for="userName">Your name</label>
+                    <input type="text" id="userName" placeholder="Your name" maxlength="30" autocomplete="name">
+
+                    <div class="upload">
+                        <label for="userImage" class="upload-label">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                <circle cx="12" cy="13" r="4" />
+                            </svg>
+                            <span id="uploadText">Add a photo (optional)</span>
+                        </label>
+                        <input type="file" id="userImage" accept="image/*" hidden onchange="handleImageUpload(event)">
+                        <button type="button" class="remove hidden" id="removeImageBtn" onclick="removeImage()">Remove photo</button>
+                        <div class="preview" id="uploadPreview" aria-hidden="true"></div>
+                    </div>
+
+                    <div class="theme-row">
+                        <span style="font-size:0.8rem;color:var(--muted);">Theme:</span>
+                        <button type="button" class="theme-swatch swatch-maroon active" data-theme="maroon" onclick="setTheme('maroon')" aria-label="Maroon theme"></button>
+                        <button type="button" class="theme-swatch swatch-saffron" data-theme="saffron" onclick="setTheme('saffron')" aria-label="Saffron theme"></button>
+                        <button type="button" class="theme-swatch swatch-emerald" data-theme="emerald" onclick="setTheme('emerald')" aria-label="Emerald theme"></button>
+                        <button type="button" class="theme-swatch swatch-indigo" data-theme="indigo" onclick="setTheme('indigo')" aria-label="Indigo theme"></button>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="createWish()">Create wish</button>
+                </div>
+            </div>
+            <div class="credit">Built by Kiran Patil</div>
+        </div>
+    </div>
+
+    <!-- Gift -->
+    <div class="gift hidden" id="giftContainer">
+        <button type="button" class="packet" id="giftBox" aria-label="Open your gift">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+                <rect x="24" y="50" width="72" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="2.2" />
+                <path d="M24 62 h72" stroke="currentColor" stroke-width="2.2" />
+                <path d="M60 50 v50" stroke="currentColor" stroke-width="2.2" />
+                <path d="M44 50 c0-16 32-16 32 0" fill="none" stroke="currentColor" stroke-width="2.2" />
+                <circle cx="60" cy="40" r="7" fill="none" stroke="currentColor" stroke-width="2.2" />
+            </svg>
+        </button>
+        <p class="tap-text">Tap to open your gift</p>
+    </div>
+
+    <!-- Wish -->
+    <div class="wish hidden" id="wishContainer">
+        <div class="frame wish-frame">
+            <div class="logo-bar">
+                <img src="logo.png" alt="Logo" class="logo">
+            </div>
+            <div class="frame-corner tl"></div>
+            <div class="frame-corner tr"></div>
+            <div class="frame-corner bl"></div>
+            <div class="frame-corner br"></div>
+
+            <svg class="rangoli small" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
+                <g class="dotring"></g>
+                <g class="petals-big"></g>
+                <g class="petals-small"></g>
+                <g class="dotring-inner"></g>
+                <g class="diya">
+                    <circle cx="250" cy="250" r="46" />
+                    <path d="M250 205 Q238 185 250 170 Q262 185 250 205 Z" />
+                </g>
+            </svg>
+
+            <div class="wish-inner">
+                <span class="from">From</span>
+                <h1 class="name" id="displayName"></h1>
+                <div class="photo hidden" id="userImageContainer">
+                    <img id="displayUserImage" alt="">
+                </div>
+                <p class="wish-text" id="wishText"></p>
+            </div>
+        </div>
+
+        <div class="share-row">
+            <button type="button" class="btn btn-share" onclick="shareWish()">Share on WhatsApp</button>
+            <button type="button" class="btn btn-ghost" onclick="copyLink()">Copy link</button>
+            <button type="button" class="btn btn-export" onclick="exportCard()">Save as image</button>
+        </div>
+        <button type="button" class="btn btn-link" onclick="createYourOwn()">Send a Diwali wish to friends</button>
+        <div class="credit">Built by Kiran Patil</div>
+    </div>
+
+    <button type="button" class="audio-toggle" id="audioToggle" onclick="toggleAudio()" aria-label="Toggle music">♫</button>
+    <audio id="bgAudio" src="audio/videoplayback.mp3" loop preload="none"></audio>
+
+    <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
