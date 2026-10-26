@@ -41,4 +41,4 @@ Open source under the MIT License.
 ## 👨‍💻 Author
 
 **Kiran Patil**
-**Suraj Rana** (original) - surajrana.dev
+
