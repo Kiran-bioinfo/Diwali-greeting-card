@@ -321,11 +321,8 @@ async function shareWish() {
     let shortUrl = window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(name);
     if (window._theme && window._theme !== 'maroon') shortUrl += '&theme=' + window._theme;
 
-    // Long link (image embedded) used for text-only fallback.
-    let longUrl = shortUrl;
-    if (userUploadedImage) {
-        longUrl += '&img=' + encodeURIComponent(userUploadedImage);
-    }
+    // Keep the shared link short: the photo travels separately as an image file.
+    // (Embedding base64 in the URL made links unusably long.)
 
     // Try to share the wish card as an image (mobile Web Share API).
     if (typeof htmlToImage !== 'undefined' && navigator.canShare) {
@@ -344,13 +341,7 @@ async function shareWish() {
         }
     }
 
-    // Try to shorten the long link for the text fallback.
-    let shareUrl = longUrl;
-    if (longUrl.length > 200) {
-        showToast('Shortening link...');
-        shareUrl = await shortenUrl(longUrl);
-    }
-    const message = `"${name}" sent you a Diwali gift!\n\nHappy Diwali! 🪔\n\n${shareUrl}`;
+    const message = `"${name}" sent you a Diwali gift!\n\nHappy Diwali! 🪔\n\n${shortUrl}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const whatsappUrl = isMobile
         ? `whatsapp://send?text=${encodeURIComponent(message)}`
