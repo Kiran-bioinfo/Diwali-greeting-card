@@ -317,14 +317,15 @@ function openGift(name) {
 
 async function shareWish() {
     const name = document.getElementById('displayName').textContent;
-    let url = window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(name);
-    if (window._theme && window._theme !== 'maroon') url += '&theme=' + window._theme;
+    // Short link (no image) used when sharing the image file separately.
+    let shortUrl = window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(name);
+    if (window._theme && window._theme !== 'maroon') shortUrl += '&theme=' + window._theme;
 
+    // Long link (image embedded) used for text-only fallback.
+    let longUrl = shortUrl;
     if (userUploadedImage) {
-        url += '&img=' + encodeURIComponent(userUploadedImage);
+        longUrl += '&img=' + encodeURIComponent(userUploadedImage);
     }
-
-    const message = `"${name}" sent you a Diwali gift!\n\nHappy Diwali! 🪔\n\n${url}`;
 
     // Try to share the wish card as an image (mobile Web Share API).
     if (typeof htmlToImage !== 'undefined' && navigator.canShare) {
@@ -334,6 +335,7 @@ async function shareWish() {
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'diwali-wish.png', { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
+                const message = `"${name}" sent you a Diwali gift!\n\nHappy Diwali! 🪔\n\n${shortUrl}`;
                 await navigator.share({ files: [file], text: message, title: 'Happy Diwali' });
                 return;
             }
@@ -342,6 +344,13 @@ async function shareWish() {
         }
     }
 
+    // Try to shorten the long link for the text fallback.
+    let shareUrl = longUrl;
+    if (longUrl.length > 200) {
+        showToast('Shortening link...');
+        shareUrl = await shortenUrl(longUrl);
+    }
+    const message = `"${name}" sent you a Diwali gift!\n\nHappy Diwali! 🪔\n\n${shareUrl}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const whatsappUrl = isMobile
         ? `whatsapp://send?text=${encodeURIComponent(message)}`
@@ -351,6 +360,29 @@ async function shareWish() {
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
         window.location.href = whatsappUrl;
     }
+}
+
+// Best-effort URL shortener (no backend). Tries free services; falls back to original.
+async function shortenUrl(longUrl) {
+    const services = [
+        'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl),
+        'https://v.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl),
+        'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl)
+    ];
+    for (const endpoint of services) {
+        try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 6000);
+            const res = await fetch(endpoint, { signal: controller.signal });
+            clearTimeout(timer);
+            if (!res.ok) continue;
+            const text = (await res.text()).trim();
+            if (text.startsWith('http')) return text;
+        } catch (e) {
+            continue;
+        }
+    }
+    return longUrl;
 }
 
 function copyLink() {
