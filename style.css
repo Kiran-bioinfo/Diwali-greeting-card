@@ -542,3 +542,6 @@ body.theme-indigo {
     .share-row { gap: 8px; }
     .toast { bottom: 16px; font-size: 0.85rem; padding: 10px 16px; }
 }
+
+.wish-medallion.has-photo .rangoli { display: none; }
+.wish-medallion.has-photo .photo { width: 150px; height: 150px; margin: 10px 0; }

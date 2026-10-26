@@ -303,11 +303,14 @@ function openGift(name) {
         displayName.style.color = userWish.color;
         wishText.innerHTML = userWish.text;
 
+        const wishMedallion = document.querySelector('.wish-medallion');
         if (userUploadedImage) {
             displayUserImage.src = userUploadedImage;
             userImageContainer.classList.remove('hidden');
+            if (wishMedallion) wishMedallion.classList.add('has-photo');
         } else {
             userImageContainer.classList.add('hidden');
+            if (wishMedallion) wishMedallion.classList.remove('has-photo');
         }
     }, 900);
 }
@@ -327,7 +330,7 @@ async function shareWish() {
     if (typeof htmlToImage !== 'undefined' && navigator.canShare) {
         try {
             const node = document.querySelector('.wish-frame');
-            const dataUrl = await htmlToImage.toPng(node, { pixelRatio: 2 });
+            const dataUrl = await htmlToImage.toPng(node, { pixelRatio: 3 });
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'diwali-wish.png', { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
@@ -407,7 +410,7 @@ async function exportCard() {
     }
     const node = document.querySelector('.wish-frame');
     try {
-        const dataUrl = await htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: null });
+        const dataUrl = await htmlToImage.toPng(node, { pixelRatio: 3, backgroundColor: null });
         const a = document.createElement('a');
         a.href = dataUrl;
         a.download = 'diwali-wish.png';
